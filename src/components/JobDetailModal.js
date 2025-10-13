@@ -1,6 +1,16 @@
-import React from "react";
+import React, { useState } from "react";
+import axios from "axios";
 
 const JobModal = ({ job, show, onClose, packageTypes }) => {
+  const [isApplying, setIsApplying] = useState(false);
+  const [applicationData, setApplicationData] = useState({
+    name: "",
+    email: "",
+    phone: "",
+    resume: null
+  });
+   const apiUrl = process.env.REACT_APP_API_URL;
+
   if (!job || !show) return null;
 
   // Function to get package styling
@@ -13,7 +23,7 @@ const JobModal = ({ job, show, onClose, packageTypes }) => {
     const baseSalary = parseInt(salary.replace(/[₹,]/g, ''));
     return {
       baseSalary: baseSalary,
-      tax: baseSalary * 0.18, // 25% tax
+      tax: baseSalary * 0.18, // 18% tax
       ctc: baseSalary * 1.15, // 15% additional benefits
       cashInHand: baseSalary * 0.75, // After tax
       benefits: baseSalary * 0.15 // Additional benefits
@@ -22,7 +32,59 @@ const JobModal = ({ job, show, onClose, packageTypes }) => {
 
   const pkg = getPackageStyle(job.package);
   const salaryBreakdown = calculateSalaryBreakdown(job.salary);
-  console.log(job.salary,"job.salary")
+
+  // Handle apply button click
+  const handleApply = async () => {
+    if (!applicationData.name || !applicationData.email || !applicationData.phone || !applicationData.resume) {
+      alert("Please fill all required fields and upload your resume");
+      return;
+    }
+
+    setIsApplying(true);
+    
+    try {
+      const formData = new FormData();
+      formData.append('name', applicationData.name);
+      formData.append('email', applicationData.email);
+      formData.append('phone', applicationData.phone);
+      formData.append('jobId', job._id); // Assuming job has _id field
+      formData.append('resume', applicationData.resume);
+      formData.append('companyId', job.companyId); // Assuming job has companyId field
+
+      const response = await axios.post(`${apiUrl}candidate/apply`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        }
+      });
+
+      console.log('Application submitted:', response.data);
+      alert('Application submitted successfully!');
+      onClose(); // Close modal after successful application
+      
+    } catch (error) {
+      console.error('Error submitting application:', error);
+      alert('Failed to submit application. Please try again.');
+    } finally {
+      setIsApplying(false);
+    }
+  };
+
+  // Handle input changes
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setApplicationData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  // Handle file upload
+  const handleFileChange = (e) => {
+    setApplicationData(prev => ({
+      ...prev,
+      resume: e.target.files[0]
+    }));
+  };
 
   return (
     <div className="modal fade show d-block" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }} tabIndex="-1">
@@ -73,7 +135,7 @@ const JobModal = ({ job, show, onClose, packageTypes }) => {
                 </div>
               </div>
             </div>
-
+            
             {/* Salary Breakdown */}
             <div className="card mb-4">
               <div className="card-header bg-light">
@@ -162,17 +224,96 @@ const JobModal = ({ job, show, onClose, packageTypes }) => {
                 </div>
               </div>
             )}
-
-            
+             {/* Application Form */}
+            <div className="card mb-4">
+              <div className="card-header bg-light">
+                <h5 className="mb-0">
+                  <i className="bi bi-person me-2"></i>
+                  Application Form
+                </h5>
+              </div>
+              <div className="card-body">
+                <div className="row">
+                  <div className="col-md-6 mb-3">
+                    <label htmlFor="name" className="form-label">Full Name <span className="text-danger">*</span></label>
+                    <input
+                      type="text"
+                      className="form-control"
+                      id="name"
+                      name="name"
+                      value={applicationData.name}
+                      onChange={handleInputChange}
+                      required
+                    />
+                  </div>
+                  <div className="col-md-6 mb-3">
+                    <label htmlFor="email" className="form-label">Email <span className="text-danger">*</span></label>
+                    <input
+                      type="email"
+                      className="form-control"
+                      id="email"
+                      name="email"
+                      value={applicationData.email}
+                      onChange={handleInputChange}
+                      required
+                    />
+                  </div>
+                  <div className="col-md-6 mb-3">
+                    <label htmlFor="phone" className="form-label">Phone <span className="text-danger">*</span></label>
+                    <input
+                      type="tel"
+                      className="form-control"
+                      id="phone"
+                      name="phone"
+                      value={applicationData.phone}
+                      onChange={handleInputChange}
+                      required
+                    />
+                  </div>
+                  <div className="col-md-6 mb-3">
+                    <label htmlFor="resume" className="form-label ">Resume  <span className="text-danger">*</span></label>
+                    <input
+                      type="file"
+                      className="form-control"
+                      id="resume"
+                      name="resume"
+                      onChange={handleFileChange}
+                      accept=".pdf,.doc,.docx"
+                      required
+                    />
+                    <small className="text-muted">Accepted formats: PDF, DOC, DOCX</small>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
 
           <div className="modal-footer">
-            <button type="button" className="btn btn-secondary" onClick={onClose}>
+            <button 
+              type="button" 
+              className="btn btn-secondary" 
+              onClick={onClose}
+              disabled={isApplying}
+            >
               Close
             </button>
-            <button type="button" className={`btn btn-${pkg.color}`}>
-              <i className="bi bi-send me-2"></i>
-              Apply for this Position
+            <button 
+              type="button" 
+              className={`btn btn-${pkg.color}`}
+              onClick={handleApply}
+              disabled={isApplying}
+            >
+              {isApplying ? (
+                <>
+                  <span className="spinner-border spinner-border-sm me-2" role="status"></span>
+                  Applying...
+                </>
+              ) : (
+                <>
+                  <i className="bi bi-send me-2"></i>
+                  Apply for this Position
+                </>
+              )}
             </button>
           </div>
         </div>
