@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 import axios from "axios";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const JobModal = ({ job, show, onClose, packageTypes }) => {
   const [isApplying, setIsApplying] = useState(false);
@@ -10,6 +12,7 @@ const JobModal = ({ job, show, onClose, packageTypes }) => {
     resume: null
   });
    const apiUrl = process.env.REACT_APP_API_URL;
+
 
   if (!job || !show) return null;
 
@@ -27,12 +30,10 @@ const JobModal = ({ job, show, onClose, packageTypes }) => {
   // Handle apply button click
   const handleApply = async () => {
     if (!applicationData.name || !applicationData.email || !applicationData.phone || !applicationData.resume) {
-      alert("Please fill all required fields and upload your resume");
+      toast.warning("Please fill all required fields and upload your resume");
       return;
     }
-
     setIsApplying(true);
-    
     try {
       const formData = new FormData();
       formData.append('name', applicationData.name);
@@ -41,25 +42,19 @@ const JobModal = ({ job, show, onClose, packageTypes }) => {
       formData.append('jobId', job._id); // Assuming job has _id field
       formData.append('resume', applicationData.resume);
       formData.append('companyId', job.companyId); // Assuming job has companyId field
-
       const response = await axios.post(`${apiUrl}candidate/apply`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         }
       });
-
-      console.log('Application submitted:', response.data);
-      alert('Application submitted successfully!');
-      onClose(); // Close modal after successful application
-      
+      toast.success(response.data.massege);
+      onClose();
     } catch (error) {
-      console.error('Error submitting application:', error);
-      alert('Failed to submit application. Please try again.');
+      toast.error(error.response.massege);
     } finally {
       setIsApplying(false);
     }
   };
-
   // Handle input changes
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -68,7 +63,6 @@ const JobModal = ({ job, show, onClose, packageTypes }) => {
       [name]: value
     }));
   };
-
   // Handle file upload
   const handleFileChange = (e) => {
     setApplicationData(prev => ({
@@ -332,6 +326,7 @@ const JobModal = ({ job, show, onClose, packageTypes }) => {
           </div>
         </div>
       </div>
+       <ToastContainer  style={{ width: "auto" }} />
     </div>
   );
 };
