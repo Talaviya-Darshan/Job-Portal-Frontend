@@ -1,5 +1,6 @@
 import React from "react";
 import WebLayout from "../../../components/WebLayout";
+import { Link } from "react-router-dom";
 export default function Services() {
   return (
     <WebLayout>
@@ -9,8 +10,7 @@ export default function Services() {
         <div className="container section-title" data-aos="fade-up">
           <h2>Services</h2>
           <p>
-            Necessitatibus eius consequatur ex aliquid fuga eum quidem sint
-            consectetur velit
+            We offer smart and efficient hiring solutions designed to simplify your recruitment process.
           </p>
         </div>
         {/* End Section Title */}
@@ -24,13 +24,12 @@ export default function Services() {
               <div className="service-item position-relative">
                 <i className="bi bi-activity" />
                 <h4>
-                  <a href="" className="stretched-link">
-                    Lorem Ipsum
-                  </a>
+                  <Link className="stretched-link">
+                   Job Posting & Management
+                  </Link>
                 </h4>
                 <p>
-                  Voluptatum deleniti atque corrupti quos dolores et quas
-                  molestias excepturi
+                  Easily create and manage job openings to attract the right talent quickly
                 </p>
               </div>
             </div>
@@ -43,13 +42,12 @@ export default function Services() {
               <div className="service-item position-relative">
                 <i className="bi bi-bounding-box-circles" />
                 <h4>
-                  <a href="" className="stretched-link">
-                    Sed ut perspici
-                  </a>
+                  <Link className="stretched-link">
+                   Interview Scheduling
+                  </Link>
                 </h4>
                 <p>
-                  Duis aute irure dolor in reprehenderit in voluptate velit esse
-                  cillum dolore
+                  Schedule and manage interviews effortlessly to streamline your hiring process.
                 </p>
               </div>
             </div>
@@ -62,13 +60,12 @@ export default function Services() {
               <div className="service-item position-relative">
                 <i className="bi bi-calendar4-week" />
                 <h4>
-                  <a href="" className="stretched-link">
-                    Magni Dolores
-                  </a>
+                  <Link className="stretched-link">
+                    Application Tracking
+                  </Link>
                 </h4>
                 <p>
-                  Excepteur sint occaecat cupidatat non proident, sunt in culpa
-                  qui officia
+                  Track every application in one place and make faster, smarter hiring decisions.
                 </p>
               </div>
             </div>
@@ -81,13 +78,12 @@ export default function Services() {
               <div className="service-item position-relative">
                 <i className="bi bi-broadcast" />
                 <h4>
-                  <a href="" className="stretched-link">
-                    Nemo Enim
-                  </a>
+                  <Link className="stretched-link">
+                    Customizable Hiring Pipeline
+                  </Link>
                 </h4>
                 <p>
-                  At vero eos et accusamus et iusto odio dignissimos ducimus qui
-                  blanditiis
+                  Customize your hiring pipeline to match your unique recruitment needs and workflow.
                 </p>
               </div>
             </div>
@@ -102,19 +98,15 @@ export default function Services() {
               <div className="service-item position-relative">
                 <div className="img">
                   <img
-                    src="Web/img/services-1.jpg"
+                    src="Web/img/dashbord.png"
                     className="img-fluid"
                     alt=""
                   />
                 </div>
-                <div className="details">
-                  <a href="service-details.html" className="stretched-link">
-                    <h3>Nesciunt Mete</h3>
-                  </a>
-                  <p>
-                    Provident nihil minus qui consequatur non omnis maiores. Eos
-                    accusantium minus dolores iure perferendis.
-                  </p>
+                <div className="details p-0">
+                  <Link  className="stretched-link">
+                    <h3 className="m-0">Dashboard</h3>
+                  </Link>
                 </div>
               </div>
             </div>
@@ -123,19 +115,16 @@ export default function Services() {
               <div className="service-item position-relative">
                 <div className="img">
                   <img
-                    src="Web/img/services-2.jpg"
+                    src="Web/img/jobListiing.png"
                     className="img-fluid"
                     alt=""
                   />
                 </div>
-                <div className="details">
+                <div className="details p-0">
                   <a href="service-details.html" className="stretched-link">
-                    <h3>Eosle Commodi</h3>
+                    <h3 className="m-0" >Job Listing</h3>
                   </a>
-                  <p>
-                    Ut autem aut autem non a. Sint sint sit facilis nam iusto
-                    sint. Libero corrupti neque eum hic non ut nesciunt dolorem.
-                  </p>
+                  
                 </div>
               </div>
             </div>
@@ -144,20 +133,16 @@ export default function Services() {
               <div className="service-item position-relative">
                 <div className="img">
                   <img
-                    src="Web/img/services-3.jpg"
+                    src="Web/img/offerlettrs.png"
                     className="img-fluid"
                     alt=""
                   />
                 </div>
-                <div className="details">
+                <div className="details p-0">
                   <a href="service-details.html" className="stretched-link">
-                    <h3>Ledo Markt</h3>
+                    <h3 className="m-0">Offer Letter</h3>
                   </a>
-                  <p>
-                    Ut excepturi voluptatem nisi sed. Quidem fuga consequatur.
-                    Minus ea aut. Vel qui id voluptas adipisci eos earum
-                    corrupti.
-                  </p>
+                 
                 </div>
               </div>
             </div>
@@ -166,19 +151,16 @@ export default function Services() {
               <div className="service-item position-relative">
                 <div className="img">
                   <img
-                    src="Web/img/services-4.jpg"
+                    src="Web/img/profailcomany.png"
                     className="img-fluid"
                     alt=""
                   />
                 </div>
-                <div className="details">
+                <div className="details p-0">
                   <a href="service-details.html" className="stretched-link">
-                    <h3>Asperiores Commodit</h3>
+                    <h3 className="m-0">Company Profile</h3>
                   </a>
-                  <p>
-                    Non et temporibus minus omnis sed dolor esse consequatur.
-                    Cupiditate sed error ea fuga sit provident adipisci neque.
-                  </p>
+                  
                   <a href="service-details.html" className="stretched-link" />
                 </div>
               </div>

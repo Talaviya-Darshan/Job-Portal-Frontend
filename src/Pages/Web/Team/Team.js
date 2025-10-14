@@ -69,8 +69,7 @@ export default function Team() {
           <div className="container section-title" data-aos="fade-up">
             <h2>Team</h2>
             <p>
-              Necessitatibus eius consequatur ex aliquid fuga eum quidem sint
-              consectetur velit
+            Meet the dedicated professionals behind TalentOS, committed to transforming the hiring experience.
             </p>
           </div>
           {/* End Section Title */}
