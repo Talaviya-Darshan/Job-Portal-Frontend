@@ -113,6 +113,7 @@ export default function Dashboard() {
       toast.error(error.response?.data?.message);
     }
   };
+  
 
   const columns = [
     {
@@ -245,6 +246,7 @@ export default function Dashboard() {
           </div>
         </div>
       </section>
+
       <section className="content">
         <div className="container-fluid">
           <div className="row">
