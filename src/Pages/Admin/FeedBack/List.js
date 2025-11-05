@@ -15,6 +15,8 @@ export default function Inbox() {
   const [searchQuery, setSearchQuery] = useState("");
   const [records, setRecords] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [perPage, setPerPage] = useState(10);
 
   useEffect(() => {
     fetchRecords();
@@ -43,11 +45,15 @@ export default function Inbox() {
     {
       name: "No",
       selector: (row, index) =>
-        row.isSkeleton ? <Skeleton width={20} /> : index + 1,
+        row.isSkeleton ? (
+          <Skeleton width={60} />
+        ) : (
+          (currentPage - 1) * perPage + index + 1
+        ),
       width: "60px",
       center: "true",
     },
-    
+
     {
       name: "Name",
       sortable: true,
@@ -170,6 +176,18 @@ export default function Inbox() {
                       columns={columns}
                       data={filteredRecords}
                       pagination
+                      paginationPerPage={perPage}
+                      paginationRowsPerPageOptions={[10, 20, 30, 40]}
+                      onChangePage={(page) => setCurrentPage(page)}
+                      onChangeRowsPerPage={(newPerPage) =>
+                        setPerPage(newPerPage)
+                      }
+                      paginationComponentOptions={{
+                        rowsPerPageText: "Rows per page",
+                        rangeSeparatorText: "of",
+                        selectAllRowsItem: true,
+                        selectAllRowsItemText: "All",
+                      }}
                       className="custom-table"
                       noDataComponent="No data available"
                       highlightOnHover
@@ -178,6 +196,8 @@ export default function Inbox() {
                         headCells: {
                           style: {
                             justifyContent: "center",
+                            fontWeight: "bold",
+                            fontSize: "14px",
                           },
                         },
                       }}

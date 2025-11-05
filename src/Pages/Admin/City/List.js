@@ -180,7 +180,7 @@ export default function List() {
                   type="button"
                   className="btn btn-block btn-primary"
                 >
-                  <i className="fas fa-plus"></i> Add
+                  <i className="fas fa-plus"></i>
                 </button>
               </div>
             </div>

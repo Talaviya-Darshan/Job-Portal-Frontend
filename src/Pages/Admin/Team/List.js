@@ -20,6 +20,8 @@ export default function List() {
   const [records, setRecords] = useState([]);
   const [loading, setLoading] = useState(false);
   const [deleteLoading, setDeleteLoading] = useState({});
+  const [currentPage, setCurrentPage] = useState(1);
+  const [perPage, setPerPage] = useState(10);
 
   useEffect(() => {
     fetchRecords();
@@ -35,7 +37,7 @@ export default function List() {
           "Cache-Control": "no-cache",
         },
       });
-      setLoading(false);
+      setLoading(true);
       const data = response.data || [];
       setRecords(data);
     } catch (error) {
@@ -43,7 +45,7 @@ export default function List() {
       toast.error(error.response?.data?.message);
     }
   };
-   const handleDelete = async (id) => {
+  const handleDelete = async (id) => {
     Swal.fire({
       title: "Are you sure?",
       text: "You want to delete this team member?",
@@ -74,14 +76,18 @@ export default function List() {
     {
       name: "No",
       selector: (row, index) =>
-        row.isSkeleton ? <Skeleton width={20} /> : index + 1,
+        row.isSkeleton ? (
+          <Skeleton width={60} />
+        ) : (
+          (currentPage - 1) * perPage + index + 1
+        ),
       width: "60px",
       center: "true",
     },
     {
       name: "Profile",
       width: "100px",
-       center: "true",
+      center: "true",
       cell: (row) =>
         row.isSkeleton ? (
           <Skeleton circle height={45} width={45} />
@@ -90,7 +96,7 @@ export default function List() {
             src={row.image || Env.REACT_APP_PROJECT_ICON}
             alt="Profile"
             height={55}
-            width={45}
+            width={55}
             className="p-1"
           />
         ),
@@ -104,7 +110,8 @@ export default function List() {
     {
       name: "Designation",
       sortable: true,
-      cell: (row) => (row.isSkeleton ? <Skeleton width={80} /> : row.designation),
+      cell: (row) =>
+        row.isSkeleton ? <Skeleton width={80} /> : row.designation,
     },
     {
       name: "Description",
@@ -125,7 +132,11 @@ export default function List() {
               type="button"
               className="btn btn-primary btn-xs d-flex align-items-center justify-content-center rounded-circle mr-1"
               style={{ width: "32px", height: "32px" }}
-              onClick={() =>navigate(`/admin/team/edit?id=${row._id}`, { state: { id: row._id },})}
+              onClick={() =>
+                navigate(`/admin/team/edit?id=${row._id}`, {
+                  state: { id: row._id },
+                })
+              }
             >
               <FilePenLine size={16} />
             </button>
@@ -147,12 +158,10 @@ export default function List() {
         ),
     },
   ];
-  
+
   const filteredRecords = records.filter(
     (record) =>
-      `${record.name}`
-        .toLowerCase()
-        .includes(searchQuery.toLowerCase()) ||
+      `${record.name}`.toLowerCase().includes(searchQuery.toLowerCase()) ||
       record.designation.toLowerCase().includes(searchQuery.toLowerCase()) ||
       (record.description || "")
         .toLowerCase()
@@ -160,7 +169,7 @@ export default function List() {
   );
 
   // Skeleton rows
-  const skeletonData = Array(8)
+  const skeletonData = Array(5)
     .fill({})
     .map((_, index) => ({
       _id: index,
@@ -169,11 +178,11 @@ export default function List() {
 
   return (
     <Layout ac9="active">
-      <ContentHeader 
-        title="Manage Team Member" 
-        breadcrumbs={[ 
-          { label: "Dashboard", to: "/admin/dashboard" }, 
-          { label: "Manage Team Member" }, 
+      <ContentHeader
+        title="Manage Team Member"
+        breadcrumbs={[
+          { label: "Dashboard", to: "/admin/dashboard" },
+          { label: "Manage Team Member" },
         ]}
       />
       <section className="content">
@@ -199,7 +208,7 @@ export default function List() {
                         type="button"
                         className="btn btn-block btn-primary"
                       >
-                        <i className="fas fa-plus"></i> Add
+                        <i className="fas fa-plus"></i> 
                       </button>
                     </div>
                   </div>
@@ -227,6 +236,18 @@ export default function List() {
                       columns={columns}
                       data={filteredRecords}
                       pagination
+                      paginationPerPage={perPage}
+                      paginationRowsPerPageOptions={[10, 20, 30, 40]}
+                      onChangePage={(page) => setCurrentPage(page)}
+                      onChangeRowsPerPage={(newPerPage) =>
+                        setPerPage(newPerPage)
+                      }
+                      paginationComponentOptions={{
+                        rowsPerPageText: "Rows per page",
+                        rangeSeparatorText: "of",
+                        selectAllRowsItem: true,
+                        selectAllRowsItemText: "All",
+                      }}
                       className="custom-table"
                       noDataComponent="No data available"
                       highlightOnHover
@@ -235,6 +256,8 @@ export default function List() {
                         headCells: {
                           style: {
                             justifyContent: "center",
+                            fontWeight: "bold",
+                            fontSize: "14px",
                           },
                         },
                       }}
@@ -248,7 +271,7 @@ export default function List() {
           </div>
         </div>
       </section>
-      <ToastContainer  style={{ width: "auto" }} />
+      <ToastContainer style={{ width: "auto" }} />
     </Layout>
   );
 }

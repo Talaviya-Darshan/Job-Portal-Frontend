@@ -14,6 +14,8 @@ export default function Inbox() {
   const [searchQuery, setSearchQuery] = useState("");
   const [records, setRecords] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [perPage, setPerPage] = useState(10);
 
   useEffect(() => {
     fetchRecords();
@@ -38,19 +40,19 @@ export default function Inbox() {
     }
   };
 
-  
-
- 
-
   const columns = [
     {
       name: "No",
       selector: (row, index) =>
-        row.isSkeleton ? <Skeleton width={20} /> : index + 1,
+        row.isSkeleton ? (
+          <Skeleton width={60} />
+        ) : (
+          (currentPage - 1) * perPage + index + 1
+        ),
       width: "60px",
       center: "true",
     },
-  
+
     {
       name: "Name",
       sortable: true,
@@ -71,13 +73,10 @@ export default function Inbox() {
     {
       name: "Message  ",
       sortable: true,
-      cell: (row) =>
-        row.isSkeleton ? <Skeleton width={100} /> : row.message,
+      cell: (row) => (row.isSkeleton ? <Skeleton width={100} /> : row.message),
     },
-
-    
   ];
-  
+
   const filteredRecords = records.filter(
     (record) =>
       `${record.firstName} ${record.lastName}`
@@ -90,7 +89,7 @@ export default function Inbox() {
   );
 
   // Skeleton rows
-  const skeletonData = Array(8)
+  const skeletonData = Array(5)
     .fill({})
     .map((_, index) => ({
       _id: index,
@@ -99,11 +98,11 @@ export default function Inbox() {
 
   return (
     <Layout ac7="active">
-      <ContentHeader 
-        title="Manage User" 
-        breadcrumbs={[ 
-          { label: "Dashboard", to: "/admin/dashboard" }, 
-          { label: "Manage User" }, 
+      <ContentHeader
+        title="Manage User"
+        breadcrumbs={[
+          { label: "Dashboard", to: "/admin/dashboard" },
+          { label: "Manage User" },
         ]}
       />
       <section className="content">
@@ -123,7 +122,6 @@ export default function Inbox() {
                         title="Search within table"
                       />
                     </div>
-                    
                   </div>
                 </div>
                 <div className="card-body text-center p-2">
@@ -149,6 +147,18 @@ export default function Inbox() {
                       columns={columns}
                       data={filteredRecords}
                       pagination
+                      paginationPerPage={perPage}
+                      paginationRowsPerPageOptions={[10, 20, 30, 40]}
+                      onChangePage={(page) => setCurrentPage(page)}
+                      onChangeRowsPerPage={(newPerPage) =>
+                        setPerPage(newPerPage)
+                      }
+                      paginationComponentOptions={{
+                        rowsPerPageText: "Rows per page",
+                        rangeSeparatorText: "of",
+                        selectAllRowsItem: true,
+                        selectAllRowsItemText: "All",
+                      }}
                       className="custom-table"
                       noDataComponent="No data available"
                       highlightOnHover
@@ -157,6 +167,8 @@ export default function Inbox() {
                         headCells: {
                           style: {
                             justifyContent: "center",
+                            fontWeight: "bold",
+                            fontSize: "14px",
                           },
                         },
                       }}
