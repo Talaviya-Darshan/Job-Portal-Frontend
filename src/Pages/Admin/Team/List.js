@@ -37,7 +37,7 @@ export default function List() {
           "Cache-Control": "no-cache",
         },
       });
-      setLoading(true);
+      setLoading(false);
       const data = response.data || [];
       setRecords(data);
     } catch (error) {
