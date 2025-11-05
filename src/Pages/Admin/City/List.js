@@ -115,7 +115,7 @@ export default function List() {
       center: "true",
       cell: (row) =>
         row.isSkeleton ? (
-          <Skeleton width={50} height={30} />
+          <Skeleton width={80} height={30} />
         ) : (
           <div className="d-flex">
             <button
@@ -150,7 +150,7 @@ export default function List() {
   );
 
   // Skeleton data for loading state
-  const skeletonData = Array(8)
+  const skeletonData = Array(5)
     .fill({})
     .map((item, index) => ({
       ...item,

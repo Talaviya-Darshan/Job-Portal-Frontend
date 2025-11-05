@@ -152,7 +152,7 @@ export default function ListMember() {
   ];
 
   // Skeleton data for loading state
-  const skeletonData = Array(8)
+  const skeletonData = Array(5)
     .fill({})
     .map((item, index) => ({
       ...item,

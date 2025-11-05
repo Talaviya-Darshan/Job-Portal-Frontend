@@ -133,13 +133,13 @@ export default function List() {
       name: "Name",
       selector: (row) => row.name,
       sortable: true,
-      cell: (row) => (row.isSkeleton ? <Skeleton width={100} /> : row.name),
+      cell: (row) => (row.isSkeleton ? <Skeleton width={150} /> : row.name),
     },
     {
       name: "Contact ",
       width: "100px",
       sortable: true,
-      cell: (row) => (row.isSkeleton ? <Skeleton width={100} /> : row.phone),
+      cell: (row) => (row.isSkeleton ? <Skeleton width={80} /> : row.phone),
     },
     {
       name: "Email",
@@ -151,7 +151,7 @@ export default function List() {
       name: "GST Number",
       width: "100px",
       cell: (row) =>
-        row.isSkeleton ? <Skeleton width={100} /> : row.GSTNumber,
+        row.isSkeleton ? <Skeleton width={80} /> : row.GSTNumber,
     },
     {
       name: "Type",
@@ -159,7 +159,7 @@ export default function List() {
       sortable: true,
       width: "60px",
       center: "true",
-      cell: (row) => (row.isSkeleton ? <Skeleton width={60} /> : row.type),
+      cell: (row) => (row.isSkeleton ? <Skeleton width={50} /> : row.type),
     },
 
     {
@@ -217,7 +217,7 @@ export default function List() {
   ];
 
   // Skeleton rows
-  const skeletonData = Array(10)
+  const skeletonData = Array(5)
     .fill({})
     .map((_, index) => ({
       _id: index,

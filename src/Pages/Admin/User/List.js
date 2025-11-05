@@ -227,7 +227,7 @@ export default function List() {
         .includes(searchQuery.toLowerCase())
   );
 
-  const skeletonData = Array(8)
+  const skeletonData = Array(5)
     .fill({})
     .map((_, index) => ({
       _id: index,
