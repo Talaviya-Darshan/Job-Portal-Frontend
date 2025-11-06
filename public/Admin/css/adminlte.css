@@ -19614,6 +19614,8 @@ html.maximized-card {
   margin: 5px 0 0 50px;
   padding: 5px 10px;
   position: relative;
+   
+ 
 }
 
 .direct-chat-text::after, .direct-chat-text::before {

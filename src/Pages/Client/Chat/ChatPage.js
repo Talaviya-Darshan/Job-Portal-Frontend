@@ -3,34 +3,22 @@
 import React, { useEffect, useState, useRef } from "react";
 import axios from "axios";
 import { io } from "socket.io-client";
-import UserLayout from "../../../components/UserLayout";
 
-export default function ChatPage() {
-  // ✅ STATIC URLs
+export default function ChatPage({ closeModal }) {
   const apiUrl = process.env.REACT_APP_API_URL;
   const socketUrl = "http://localhost:3000";
-  const token = localStorage.getItem("token");
-
-  // ✅ Logged-in user ID
   const meId = localStorage.getItem("id");
-
-  // ✅ FIXED SUPER ADMIN ID
+  const [peerName] = useState("Super Admin");
   const superAdminId = "6905d8d7bcb853ba392fd458";
-
-  const [peerName, setPeerName] = useState("Super Admin");
   const [messages, setMessages] = useState([]);
   const [text, setText] = useState("");
-
   const [socket, setSocket] = useState(null);
   const msgBoxRef = useRef(null);
 
   // ✅ Connect socket
   useEffect(() => {
-    const s = io(socketUrl, {
-      transports: ["websocket", "polling"],
-    });
+    const s = io(socketUrl, { transports: ["websocket", "polling"] });
     setSocket(s);
-
     return () => s.disconnect();
   }, []);
 
@@ -41,7 +29,7 @@ export default function ChatPage() {
     }
   }, [socket, meId]);
 
-  // ✅ Load chat history (Only YOU ↔ SUPER ADMIN)
+  // ✅ Load chat history
   useEffect(() => {
     if (!meId) return;
 
@@ -51,7 +39,7 @@ export default function ChatPage() {
       .catch(() => {});
   }, [meId]);
 
-  // ✅ Receive messages
+  // ✅ Receive Socket Messages
   useEffect(() => {
     if (!socket) return;
 
@@ -74,7 +62,6 @@ export default function ChatPage() {
     }
   }, [messages]);
 
-  // ✅ Send Message (Always to SUPER ADMIN)
   const sendMessage = () => {
     if (!text.trim()) return;
 
@@ -88,122 +75,133 @@ export default function ChatPage() {
   };
 
   return (
-    <UserLayout ac1="active">
-      <div
-        style={{
-          display: "flex",
-          height: "90vh",
-          border: "1px solid #ddd",
-          borderRadius: "10px",
-          overflow: "hidden",
-        }}
-      >
-        {/* ✅ Left Section (Fixed Super Admin) */}
-        <div
-          style={{
-            width: "260px",
-            borderRight: "1px solid #ddd",
-            padding: "10px",
-            background: "#f7f7f7",
-          }}
-        >
-          <h4>Super Admin</h4>
-          <div
-            style={{
-              padding: "10px",
-              background: "#e6f7ff",
-              borderRadius: "8px",
-              border: "1px solid #ddd",
-            }}
-          >
-            {peerName}
-          </div>
+    <div className="modal-dialog modal-xl">
+      <div className="modal-content">
+        {/* Header */}
+        <div className="modal-header">
+          <h5 className="modal-title">{peerName}</h5>
+          <button className="close" onClick={closeModal}>
+            <span>&times;</span>
+          </button>
         </div>
 
-        {/* ✅ CHAT WINDOW */}
-        <div style={{ flex: 1, display: "flex", flexDirection: "column" }}>
-          {/* Header */}
-          <div
-            style={{
-              padding: "10px",
-              borderBottom: "1px solid #ddd",
-              background: "#fafafa",
-            }}
-          >
-            <b>Chat with:</b> {peerName}
-          </div>
-
-          {/* Chat Messages */}
-          <div
-            ref={msgBoxRef}
-            style={{
-              flex: 1,
-              padding: "10px",
-              overflowY: "auto",
-              background: "#fff",
-            }}
-          >
-            {messages.map((m, i) => {
-              const isMine = m.senderId === meId;
-              return (
-                <div
-                  key={i}
-                  style={{
-                    textAlign: isMine ? "right" : "left",
-                    margin: "8px 0",
-                  }}
+        {/* Body */}
+        <div className="modal-body">
+          <div className="card direct-chat direct-chat-primary">
+            <div className="card-header">
+              <h3 className="card-title">Direct Chat</h3>
+              <div className="card-tools">
+                <button
+                  type="button"
+                  className="btn btn-tool"
+                  onClick={closeModal}
                 >
-                  <span
-                    style={{
-                      display: "inline-block",
-                      padding: "8px 10px",
-                      borderRadius: "10px",
-                      background: isMine ? "#DCF8C6" : "#f1f1f1",
-                    }}
-                  >
-                    {m.message}
+                  {" "}
+                  <i className="fas fa-times" />
+                </button>
+              </div>
+            </div>
+
+            <div className="card-body">
+              <div className="direct-chat-messages">
+                {/* LEFT MESSAGE */}
+                <div className="direct-chat-msg">
+                  <div className="direct-chat-infos clearfix">
+                    <span className="direct-chat-name float-left">
+                      Alexander Pierce
+                    </span>
+                  </div>
+                  <img
+                    className="direct-chat-img"
+                    src="https://cdn-icons-png.freepik.com/512/16800/16800177.png"
+                    alt="d"
+                  />
+                  <div className="direct-chat-text">
+                    Is this template really for free? That's unbelievable!
+                  </div>
+                </div>
+
+                {/* RIGHT MESSAGE */}
+                <div className="direct-chat-msg right">
+                  <div className="direct-chat-infos clearfix">
+                    <span className="direct-chat-name float-right">
+                      Sarah Bullock
+                    </span>
+                  </div>
+                  <img
+                    className="direct-chat-img"
+                    src="https://cdn-icons-png.freepik.com/512/16800/16800177.png"
+                    alt="ss"
+                  />
+                  <div className="direct-chat-text">You better believe it!</div>
+                </div>
+              </div>
+            </div>
+
+            <div className="card-footer">
+              <form action="#" method="post">
+                <div className="input-group">
+                  <input
+                    type="text"
+                    name="message"
+                    placeholder="Type Message ..."
+                    className="form-control"
+                  />
+                  <span className="input-group-append">
+                    <button type="button" className="btn btn-primary">
+                      Send
+                    </button>
                   </span>
                 </div>
-              );
-            })}
+              </form>
+            </div>
           </div>
 
-          {/* Input */}
-          <div
-            style={{
-              display: "flex",
-              padding: "10px",
-              borderTop: "1px solid #ddd",
-              background: "#fafafa",
-            }}
-          >
-            <input
-              value={text}
-              onChange={(e) => setText(e.target.value)}
-              onKeyDown={(e) => e.key === "Enter" && sendMessage()}
-              placeholder="Type message..."
-              style={{
-                flex: 1,
-                padding: "8px",
-                borderRadius: "6px",
-                border: "1px solid #ccc",
-              }}
-            />
-            <button
-              onClick={sendMessage}
-              style={{
-                padding: "8px 14px",
-                marginLeft: "8px",
-                background: "#111",
-                color: "#fff",
-                borderRadius: "6px",
-              }}
-            >
-              Send
-            </button>
+          <div className="d-flex border rounded" style={{ height: "50vh" }}>
+            <div className="d-flex flex-column flex-grow-1">
+              {/* Chat box */}
+              <div
+                ref={msgBoxRef}
+                className="flex-grow-1 p-3 overflow-auto bg-white"
+              >
+                {messages.map((m, i) => {
+                  const isMine = m.senderId === meId;
+                  return (
+                    <div
+                      key={i}
+                      className={`mb-2 d-flex ${
+                        isMine ? "justify-content-end" : "justify-content-start"
+                      }`}
+                    >
+                      <span
+                        className={` px-3 rounded   ${
+                          isMine ? "bg-primary text-white" : "bg-secondary"
+                        }`}
+                      >
+                        {m.message}
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
+
+              {/* Input */}
+              <div className="d-flex p-2 border-top bg-light">
+                <input
+                  value={text}
+                  onChange={(e) => setText(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && sendMessage()}
+                  className="form-control"
+                  placeholder="Type message..."
+                />
+                <button className="btn btn-dark ms-2" onClick={sendMessage}>
+                  Send
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       </div>
-    </UserLayout>
+    </div>
   );
 }
