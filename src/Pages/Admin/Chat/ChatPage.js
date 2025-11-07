@@ -2,22 +2,18 @@
 import React, { useEffect, useState, useRef } from "react";
 import axios from "axios";
 import { io } from "socket.io-client";
-import Layout from "../../../components/Layout";
 
-export default function ChatPage() {
+export default function ChatPage({ closeModal }) {
   const apiUrl = process.env.REACT_APP_API_URL;
   const socketUrl = "http://localhost:3000";
   const token = localStorage.getItem("token");
   const meId = localStorage.getItem("id");
-
   const [users, setUsers] = useState([]);
-  const [peer, setPeer] = useState(null);   // selected user object
+  const [peer, setPeer] = useState(null); // selected user object
   const [messages, setMessages] = useState([]);
   const [text, setText] = useState("");
-
   const [socket, setSocket] = useState(null);
   const [typing, setTyping] = useState(false);
-
   const msgBoxRef = useRef(null);
   const typingTimeoutRef = useRef(null);
 
@@ -26,6 +22,7 @@ export default function ChatPage() {
     const s = io(socketUrl, { transports: ["websocket", "polling"] });
     setSocket(s);
     return () => s.disconnect();
+    // eslint-disable-next-line
   }, []);
 
   // ✅ Join Room
@@ -41,6 +38,7 @@ export default function ChatPage() {
       .get(`${apiUrl}user/get`, { headers: { Authorization: token } })
       .then((res) => setUsers(res.data))
       .catch(() => {});
+      // eslint-disable-next-line
   }, []);
 
   // ✅ Load Chat History when user selects
@@ -51,6 +49,7 @@ export default function ChatPage() {
       .get(`${apiUrl}chat/${meId}/${peer._id}`)
       .then((res) => setMessages(res.data))
       .catch(() => {});
+      // eslint-disable-next-line
   }, [peer]);
 
   // ✅ Receive Message + Typing
@@ -79,6 +78,7 @@ export default function ChatPage() {
       socket.off("typing");
       socket.off("stopTyping");
     };
+    // eslint-disable-next-line
   }, [socket, peer]);
 
   // ✅ Auto Scroll
@@ -130,121 +130,145 @@ export default function ChatPage() {
     });
 
   return (
-    <>
-      <div style={{ display: "flex", height: "90vh" }}>
-        
-        {/* ✅ Users List */}
-        <div style={{ width: "260px", borderRight: "1px solid #ddd" }}>
-          <h4 className="p-2 bg-light m-0">Users</h4>
-          {users.map((u) => (
-            <div
-              key={u._id}
-              onClick={() => setPeer(u)}
-              className="p-2"
-              style={{
-                cursor: "pointer",
-                background: peer?._id === u._id ? "#e6f7ff" : "white",
-                borderBottom: "1px solid #eee",
-              }}
-            >
-              {u.firstName} {u.lastName}
-            </div>
-          ))}
-        </div>
-
-        {/* ✅ Chat Window */}
-        <div style={{ flex: 1 }}>
-          <div className="card direct-chat direct-chat-primary" style={{ height: "100%" }}>
-            
-            {/* ✅ Header */}
+    <div className="modal-dialog modal-xl">
+      <div className="modal-content">
+        <div className="modal-body p-0">
+          <div className="card direct-chat direct-chat-primary">
             <div className="card-header">
               <h3 className="card-title">
-                {peer ? `Chat with ${peer.firstName}` : "Select user"}
+                
               </h3>
+              <div className="card-tools">
+                <button className="btn btn-tool" onClick={closeModal}>
+                  <i className="fas fa-times" />
+                </button>
+              </div>
             </div>
+            <div className="d-flex" >
+              {/* ✅ Users List */}
+              <div style={{ width: "260px", borderRight: "1px solid #ddd" }}>
+                <h4 className="p-2 bg-light m-0">Users</h4>
+                {users.map((u) => (
+                  <div
+                    key={u._id}
+                    onClick={() => setPeer(u)}
+                    className="p-2"
+                    style={{
+                      cursor: "pointer",
+                      background: peer?._id === u._id ? "#e6f7ff" : "white",
+                      borderBottom: "1px solid #eee",
+                    }}
+                  >
+                    {u.firstName} {u.lastName}
+                  </div>
+                ))}
+              </div>
 
-            {/* ✅ Chat Messages */}
-            <div className="card-body">
-              <div className="direct-chat-messages" ref={msgBoxRef}>
-                {messages.map((m, i) => {
-                  const isMine = m.senderId === meId;
-                  const curTs = getStamp(m);
-                  const prev = messages[i - 1];
+              {/* ✅ Chat Window */}
+              <div style={{ flex: 1 }}>
+                <div
+                  className="card direct-chat direct-chat-primary"
+                  style={{ height: "100%" }}
+                >
+                  {/* ✅ Header */}
+                  <div className="card-header">
+                    <h3 className="card-title">
+                      {peer ? `Chat with ${peer.firstName}` : "Select user"}
+                    </h3>
+                  </div>
 
-                  const needDate =
-                    i === 0 ||
-                    new Date(getStamp(prev)).toDateString() !==
-                      new Date(curTs).toDateString();
+                  {/* ✅ Chat Messages */}
+                  <div className="card-body">
+                    <div className="direct-chat-messages" ref={msgBoxRef}>
+                      {messages.map((m, i) => {
+                        const isMine = m.senderId === meId;
+                        const curTs = getStamp(m);
+                        const prev = messages[i - 1];
 
-                  return (
-                    <React.Fragment key={i}>
-                      {needDate && (
-                        <div className="date-divider">
-                          <div className="line" />
-                          <span className="label">{fmtDate(curTs)}</span>
-                          <div className="line" />
+                        const needDate =
+                          i === 0 ||
+                          new Date(getStamp(prev)).toDateString() !==
+                            new Date(curTs).toDateString();
+
+                        return (
+                          <React.Fragment key={i}>
+                            {needDate && (
+                              <div className="date-divider">
+                                <div className="line" />
+                                <span className="label">{fmtDate(curTs)}</span>
+                                <div className="line" />
+                              </div>
+                            )}
+
+                            <div
+                              className={`direct-chat-msg ${
+                                isMine ? "right" : ""
+                              }`}
+                            >
+                              <img
+                                src={
+                                  isMine
+                                    ? peer?.profileImage
+                                    : peer?.profileImage || "/user.png"
+                                }
+                                className="direct-chat-img"
+                                alt=""
+                              />
+
+                              <div className="direct-chat-text msg-with-time">
+                                {m.message}
+
+                                <span
+                                  className={`msg-time ${
+                                    isMine ? "right-corner" : "left-corner"
+                                  }`}
+                                >
+                                  {fmtTime(curTs)}
+                                </span>
+                              </div>
+                            </div>
+                          </React.Fragment>
+                        );
+                      })}
+
+                      {/* Typing */}
+                      {typing && (
+                        <div className="typing-indicator">
+                          {peer?.firstName} is typing…
                         </div>
                       )}
-
-                      <div className={`direct-chat-msg ${isMine ? "right" : ""}`}>
-                        <img
-                          src={
-                            isMine
-                              ? peer?.profileImage
-                              : peer?.profileImage || "/user.png"
-                          }
-                          className="direct-chat-img"
-                          alt=""
-                        />
-
-                        <div className="direct-chat-text msg-with-time">
-                          {m.message}
-
-                          <span
-                            className={`msg-time ${
-                              isMine ? "right-corner" : "left-corner"
-                            }`}
-                          >
-                            {fmtTime(curTs)}
-                          </span>
-                        </div>
-                      </div>
-                    </React.Fragment>
-                  );
-                })}
-
-                {/* Typing */}
-                {typing && (
-                  <div className="typing-indicator">
-                    {peer?.firstName} is typing…
+                    </div>
                   </div>
-                )}
-              </div>
-            </div>
 
-            {/* ✅ Input */}
-            {peer && (
-              <div className="card-footer">
-                <div className="input-group">
-                  <input
-                    type="text"
-                    placeholder="Type Message ..."
-                    className="form-control direct-chat-input"
-                    value={text}
-                    onChange={handleTyping}
-                    onKeyDown={(e) => e.key === "Enter" && sendMessage()}
-                  />
-                  <span className="input-group-append">
-                    <button className="btn btn-primary" onClick={sendMessage}>
-                      Send
-                    </button>
-                  </span>
+                  {/* ✅ Input */}
+                  {peer && (
+                    <div className="card-footer">
+                      <div className="input-group">
+                        <input
+                          type="text"
+                          placeholder="Type Message ..."
+                          className="form-control direct-chat-input"
+                          value={text}
+                          onChange={handleTyping}
+                          onKeyDown={(e) => e.key === "Enter" && sendMessage()}
+                        />
+                        <span className="input-group-append">
+                          <button
+                            className="btn btn-primary"
+                            onClick={sendMessage}
+                          >
+                            Send
+                          </button>
+                        </span>
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
-            )}
+            </div>
           </div>
         </div>
       </div>
-    </>
+    </div>
   );
 }

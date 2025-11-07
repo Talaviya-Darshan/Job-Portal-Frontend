@@ -5,20 +5,15 @@ import { io } from "socket.io-client";
 export default function ChatPage({ closeModal }) {
   const apiUrl = process.env.REACT_APP_API_URL;
   const socketUrl = "http://localhost:3000";
-
   const meId = localStorage.getItem("id");
-
   const [admin, setAdmin] = useState(null);
   const [user, setUser] = useState(null);
   const [superAdminId, setSuperAdminId] = useState("");
   const [messages, setMessages] = useState([]);
-
   const [text, setText] = useState("");
   const [socket, setSocket] = useState(null);
-
   const [typing, setTyping] = useState(false);  
   const typingTimeoutRef = useRef(null);
-
   const msgBoxRef = useRef(null);
 
   // ✅ Connect Socket
@@ -26,6 +21,7 @@ export default function ChatPage({ closeModal }) {
     const s = io(socketUrl, { transports: ["websocket", "polling"] });
     setSocket(s);
     return () => s.disconnect();
+    // eslint-disable-next-line
   }, []);
 
   // ✅ Fetch Admin + User
@@ -40,6 +36,7 @@ export default function ChatPage({ closeModal }) {
         setSuperAdminId(res.data.admin._id);
       })
       .catch(() => {});
+    // eslint-disable-next-line
   }, []);
 
   // ✅ Load chat history
@@ -50,6 +47,7 @@ export default function ChatPage({ closeModal }) {
       .get(`${apiUrl}chat/${meId}/${superAdminId}`)
       .then((res) => setMessages(res.data))
       .catch(() => {});
+      // eslint-disable-next-line
   }, [meId, superAdminId]);
 
   // ✅ Join Room
