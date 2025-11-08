@@ -9,9 +9,9 @@ export default function ChatPage({ closeModal }) {
   const token = localStorage.getItem("token");
   const meId = localStorage.getItem("id");
 
-  const [users, setUsers] = useState([]);            // ALL USERS LIST (live)
-  const [peer, setPeer] = useState(null);            // selected chat partner
-  const [messages, setMessages] = useState([]);      // chat messages
+  const [users, setUsers] = useState([]);           
+  const [peer, setPeer] = useState(null);           
+  const [messages, setMessages] = useState([]);      
   const [text, setText] = useState("");
   const [socket, setSocket] = useState(null);
   const [typing, setTyping] = useState(false);
@@ -19,21 +19,21 @@ export default function ChatPage({ closeModal }) {
   const msgBoxRef = useRef(null);
   const typingTimeoutRef = useRef(null);
 
-  // ✅ Connect Socket
+  // Connect Socket
   useEffect(() => {
     const s = io(socketUrl, { transports: ["websocket"] });
     setSocket(s);
     return () => s.disconnect();
   }, []);
 
-  // ✅ Join Socket room
+  // Join Socket
   useEffect(() => {
     if (socket && meId) {
       socket.emit("join", { userId: meId });
     }
   }, [socket, meId]);
 
-  // ✅ Listen to Live Users List (online, unseen, images)
+  // Live Users
   useEffect(() => {
     if (!socket) return;
 
@@ -44,7 +44,7 @@ export default function ChatPage({ closeModal }) {
     return () => socket.off("usersList");
   }, [socket]);
 
-  // ✅ Load chat history on user click
+  // Load chat history
   useEffect(() => {
     if (!peer) return;
 
@@ -59,7 +59,7 @@ export default function ChatPage({ closeModal }) {
       .catch(() => {});
   }, [peer, apiUrl, meId, token, socket]);
 
-  // ✅ Receive Message + Typing events
+  // Socket Listeners (Message + Typing)
   useEffect(() => {
     if (!socket) return;
 
@@ -71,18 +71,18 @@ export default function ChatPage({ closeModal }) {
         setMessages((prev) => [...prev, msg]);
       }
 
-      // mark seen if it's from peer
       if (msg.senderId === peer?._id) {
         socket.emit("markSeen", { userId: meId, fromId: peer._id });
       }
     });
 
-    socket.on("typing", (id) => {
-      if (peer && id === peer._id) setTyping(true);
+    // ✅ FIXED: typing receives simple ID (same as admin version)
+    socket.on("typing", (senderId) => {
+      if (peer && senderId === peer._id) setTyping(true);
     });
 
-    socket.on("stopTyping", (id) => {
-      if (peer && id === peer._id) setTyping(false);
+    socket.on("stopTyping", (senderId) => {
+      if (peer && senderId === peer._id) setTyping(false);
     });
 
     return () => {
@@ -92,14 +92,14 @@ export default function ChatPage({ closeModal }) {
     };
   }, [socket, peer, meId]);
 
-  // ✅ Auto scroll to bottom
+  // Auto Scroll
   useEffect(() => {
     if (msgBoxRef.current) {
       msgBoxRef.current.scrollTop = msgBoxRef.current.scrollHeight;
     }
-  }, [messages]);
+  }, [messages, typing]);
 
-  // ✅ Send message
+  // Send Message
   const sendMessage = () => {
     if (!text.trim() || !peer) return;
 
@@ -109,25 +109,27 @@ export default function ChatPage({ closeModal }) {
       message: text,
     });
 
-    socket.emit("stopTyping", { senderId: meId, receiverId: peer._id });
+    socket.emit("stopTyping", meId);
 
     setText("");
   };
 
-  // ✅ Typing handler
+  // ✅ FIXED Typing Handler (simple ID emit)
   const handleTyping = (e) => {
+    if (!peer) return;
+
     setText(e.target.value);
 
-    socket.emit("typing", { senderId: meId, receiverId: peer._id });
+    socket.emit("typing", meId);
 
     if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
 
     typingTimeoutRef.current = setTimeout(() => {
-      socket.emit("stopTyping", { senderId: meId, receiverId: peer._id });
+      socket.emit("stopTyping", meId);
     }, 800);
   };
 
-  // ✅ Helpers
+  // Helpers
   const getStamp = (m) => m?.createdAt || m?.timestamp || Date.now();
   const fmtDate = (ts) =>
     new Date(ts).toLocaleDateString("en-IN", {
@@ -135,6 +137,7 @@ export default function ChatPage({ closeModal }) {
       day: "2-digit",
       month: "short",
     });
+
   const fmtTime = (ts) =>
     new Date(ts).toLocaleTimeString("en-IN", {
       hour: "2-digit",
@@ -160,8 +163,8 @@ export default function ChatPage({ closeModal }) {
             </div>
 
             <div className="d-flex">
-              
-              {/* ✅ LEFT USER LIST */}
+
+              {/* Users */}
               <div style={{ width: "260px", borderRight: "1px solid #ddd" }}>
                 <h4 className="p-2 bg-light m-0">Users</h4>
 
@@ -176,7 +179,6 @@ export default function ChatPage({ closeModal }) {
                       borderBottom: "1px solid #eee",
                     }}
                   >
-                    {/* ✅ User Image */}
                     <img
                       src={
                         u.profileImage ||
@@ -193,7 +195,6 @@ export default function ChatPage({ closeModal }) {
                         {u.firstName} {u.lastName}
                       </div>
 
-                      {/* ✅ Online / Offline */}
                       <small>
                         {u.online ? (
                           <span style={{ color: "green" }}>● Online</span>
@@ -203,7 +204,6 @@ export default function ChatPage({ closeModal }) {
                       </small>
                     </div>
 
-                    {/* ✅ Unseen Badge */}
                     {u.unseen > 0 && (
                       <span
                         style={{
@@ -221,7 +221,7 @@ export default function ChatPage({ closeModal }) {
                 ))}
               </div>
 
-              {/* ✅ CHAT WINDOW */}
+              {/* Chat Box */}
               <div style={{ flex: 1 }}>
                 <div
                   className="card direct-chat direct-chat-primary"
@@ -233,7 +233,7 @@ export default function ChatPage({ closeModal }) {
                     </h3>
                   </div>
 
-                  {/* ✅ Messages */}
+                  {/* Messages */}
                   <div className="card-body">
                     <div className="direct-chat-messages" ref={msgBoxRef}>
                       {messages.map((m, i) => {
@@ -283,7 +283,7 @@ export default function ChatPage({ closeModal }) {
                         );
                       })}
 
-                      {/* ✅ Typing indicator */}
+                      {/* Typing */}
                       {typing && (
                         <div className="typing-indicator">
                           {peer?.firstName} is typing…
@@ -292,7 +292,7 @@ export default function ChatPage({ closeModal }) {
                     </div>
                   </div>
 
-                  {/* ✅ Input */}
+                  {/* Input */}
                   {peer && (
                     <div className="card-footer">
                       <div className="input-group">
