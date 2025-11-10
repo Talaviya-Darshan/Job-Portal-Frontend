@@ -192,6 +192,7 @@ export default function MassageModal({ closeModal }) {
     if (role === "user" && superAdminId) {
       socket.emit("markSeen", { userId: meId, fromId: superAdminId });
     }
+    // eslint-disable-next-line
   }, [messages]);
 
   // TYPING HANDLER
