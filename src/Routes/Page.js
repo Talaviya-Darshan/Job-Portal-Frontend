@@ -42,7 +42,7 @@ import ForgetPassWord from "../Pages/Admin/Profile/ForgetPassword";
 import TeamAdd from "../Pages/Admin/Team/Add";
 import TeamEdit from "../Pages/Admin/Team/Edit";
 import TeamList from "../Pages/Admin/Team/List";
-import ChatPage from "../Pages/Admin/Chat/ChatPage";
+
 
 // Admin Pages
 import ClientDashboard from "../Pages/Client/Dashboard";
@@ -59,7 +59,7 @@ import AdminProfile  from "../Pages/Client/Profile/AdminProfile";
 import ChangePassword from "../Pages/Client/Profile/ChangePassword";
 import OfferLetterAdd from "../Pages/Client/OfferLetter/OfferLetterList";
 import ClientChangePassword from "../Pages/Client/Profile/ChangePassword";
-import ClientChatPage from "../Pages/Client/Chat/ChatPage";
+
 
 
 
@@ -114,7 +114,7 @@ export default function App() {
             <Route   path="team/add"           element={<ProtectedRoute    element={<TeamAdd />}                  allowedRoles={['admin']}   />} />
             <Route   path="team/edit"          element={<ProtectedRoute    element={<TeamEdit />}                 allowedRoles={['admin']}   />} />
             <Route   path="team/list"          element={<ProtectedRoute    element={<TeamList />}                 allowedRoles={['admin']}   />} />
-            <Route   path="chat"       element={<ProtectedRoute    element={<ChatPage />}                 allowedRoles={['admin']}   />} />
+            
 
             
             {/* User protected routes */}
@@ -132,7 +132,7 @@ export default function App() {
             <Route   path="changepassword"     element={<ProtectedRoute    element={<ChangePassword />}           allowedRoles={['user']}    />} />
             <Route   path="offerletter"        element={<ProtectedRoute    element={<OfferLetterAdd />}           allowedRoles={['user']}    />} />
             <Route   path="resetpassword"      element={<ProtectedRoute    element={<ClientChangePassword />}     allowedRoles={['user']}    />} />
-            <Route   path="clientchat"      element={<ProtectedRoute    element={<ClientChatPage />}           allowedRoles={['user']}    />} />
+            
             
 
           

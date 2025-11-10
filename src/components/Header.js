@@ -1,23 +1,12 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { MdNotifications } from "react-icons/md";
-import ChatPage from "../Pages/Client/Chat/ChatPage";
-import Chat from "../Pages/Admin/Chat/ChatPage";
+import  MassageModal from "./MassageModal";
 
 export default function Header() {
-  const [isFullScreen, setIsFullScreen] = useState(false);
-  const [showModal, setShowModal] = useState(false);
   const [showChat, setShowChat] = useState(false);
   const navigate = useNavigate();
   const role = localStorage.getItem("role");
-
-  useEffect(() => {
-    const handleChange = () => {
-      setIsFullScreen(!!document.fullscreenElement);
-    };
-    document.addEventListener("fullscreenchange", handleChange);
-    return () => document.removeEventListener("fullscreenchange", handleChange);
-  }, []);
 
   const logout = () => {
     localStorage.clear();
@@ -99,7 +88,7 @@ export default function Header() {
               <li className="nav-item dropdown">
                 <Link
                   className="nav-link border-0 bg-transparent"
-                  onClick={() => setShowModal(true)}
+                  onClick={() => setShowChat(true)}
                 >
                   <MdNotifications size={22} />
                 </Link>
@@ -121,22 +110,13 @@ export default function Header() {
         </ul>
       </nav>
 
-      {/* ✅ SIMPLE MODAL UI */}
-      {showModal && (
-        <div
-          className="modal fade show"
-          style={{ display: "block", backgroundColor: "rgba(0,0,0,0.5)" }}
-        >
-          <ChatPage closeModal={() => setShowModal(false)} />
-        </div>
-      )}
       {/* Admin chat */}
       {showChat && (
         <div
           className="modal fade show"
           style={{ display: "block", backgroundColor: "rgba(0,0,0,0.5)" }}
         >
-          <Chat closeModal={() => setShowChat(false)} />
+          <MassageModal closeModal={() => setShowChat(false)} />
         </div>
       )}
     </>
