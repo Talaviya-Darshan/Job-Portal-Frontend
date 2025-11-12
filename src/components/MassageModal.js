@@ -7,12 +7,10 @@ import { HiStatusOnline, HiStatusOffline } from "react-icons/hi";
 export default function MassageModal({ closeModal }) {
   const apiUrl = process.env.REACT_APP_API_URL;
   const socketUrl = process.env.REACT_APP_SOCKET_URL;
-
   const role = localStorage.getItem("role");
   const meId = localStorage.getItem("id");
   const token = localStorage.getItem("token");
   const myProfileImage = localStorage.getItem("profileImage");
-
   const [socket, setSocket] = useState(null);
   const [users, setUsers] = useState([]);
   const [peer, setPeer] = useState(null);
@@ -25,7 +23,6 @@ export default function MassageModal({ closeModal }) {
   const [typing, setTyping] = useState(false);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
-
   const msgBoxRef = useRef(null);
   const typingTimeoutRef = useRef(null);
 
@@ -207,6 +204,7 @@ export default function MassageModal({ closeModal }) {
     if (role === "user" && superAdminId) {
       socket.emit("markSeen", { userId: meId, fromId: superAdminId });
     }
+    
   }, [messages]);
 
   // TYPING HANDLER
