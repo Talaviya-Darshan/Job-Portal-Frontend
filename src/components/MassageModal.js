@@ -1,4 +1,4 @@
-// ✅ FINAL 100% WORKING VERSION (with instant-send message fix + auto-scroll)
+// ✅ FINAL 100% WORKING VERSION (with instant-send + auto-scroll + online status fix)
 import React, { useEffect, useState, useRef } from "react";
 import axios from "axios";
 import { io } from "socket.io-client";
@@ -88,6 +88,21 @@ export default function MassageModal({ closeModal }) {
 
     return () => socket.off("usersList");
   }, [socket, role]);
+
+  // ✅ ONLINE STATUS FIX (USER SIDE)
+  useEffect(() => {
+    if (!socket || role !== "user") return;
+
+    socket.on("onlineUsers", (onlineList) => {
+      if (!superAdminId) return;
+      setIsOnline(onlineList.includes(superAdminId));
+    });
+
+    // request current online list on load
+    socket.emit("getOnlineUsers");
+
+    return () => socket.off("onlineUsers");
+  }, [socket, superAdminId, role]);
 
   // LOAD CHAT HISTORY
   useEffect(() => {
@@ -223,12 +238,8 @@ export default function MassageModal({ closeModal }) {
       createdAt: new Date().toISOString(),
     };
 
-    // ✅ Show message immediately in UI
-    setMessages((prev) => [...prev, newMsg]);
-
-    // ✅ Send to server
+    setMessages((prev) => [...prev, newMsg]); // show instantly
     socket.emit("sendMessage", newMsg);
-
     socket.emit("stopTyping", { senderId: meId, receiverId });
     setText("");
   };
@@ -242,7 +253,6 @@ export default function MassageModal({ closeModal }) {
     }, 70);
   }, [messages, peer, loading]);
 
-  // helpers
   const getStamp = (m) => m?.createdAt || m?.timestamp || Date.now();
   const fmtDate = (ts) =>
     new Date(ts).toLocaleDateString("en-IN", {
@@ -261,7 +271,6 @@ export default function MassageModal({ closeModal }) {
       <div className="modal-content">
         <div className="modal-body p-0">
           <div className="card direct-chat direct-chat-primary">
-
             {/* HEADER */}
             <div className="card-header">
               <h3 className="card-title">
@@ -272,7 +281,7 @@ export default function MassageModal({ closeModal }) {
                     ) : (
                       <HiStatusOffline size={25} color="red" />
                     )}
-                    Chat with {admin?.firstName || "Admin"}
+                    &nbsp;Chat with {admin?.firstName || "Admin"}
                   </>
                 ) : (
                   <>{peer ? `Chat with ${peer.firstName}` : "Messages"}</>
@@ -292,9 +301,7 @@ export default function MassageModal({ closeModal }) {
               </div>
             )}
 
-            {/* BODY */}
             <div className="d-flex">
-
               {/* LEFT SIDE (ADMIN USERS LIST) */}
               {role === "admin" && (
                 <div style={{ width: "260px", borderRight: "1px solid #ddd" }}>
@@ -313,7 +320,8 @@ export default function MassageModal({ closeModal }) {
                       className="p-2 d-flex align-items-center gap-2"
                       style={{
                         cursor: "pointer",
-                        background: peer?._id === u._id ? "#e7f5ff" : "white",
+                        background:
+                          peer?._id === u._id ? "#e7f5ff" : "white",
                         borderBottom: "1px solid #eee",
                       }}
                     >
@@ -327,9 +335,10 @@ export default function MassageModal({ closeModal }) {
                         className="img-circle img-bordered-sm"
                         alt=""
                       />
-
                       <div className="flex-grow-1">
-                        <div>{u.firstName} {u.lastName}</div>
+                        <div>
+                          {u.firstName} {u.lastName}
+                        </div>
                         <small>
                           {u.online ? (
                             <span style={{ color: "green" }}>● Online</span>
@@ -366,7 +375,6 @@ export default function MassageModal({ closeModal }) {
                     </div>
                   ) : (
                     <div className="direct-chat-messages" ref={msgBoxRef}>
-
                       {messages.length === 0 && !typing && (
                         <div className="text-center text-muted p-5">
                           <i className="far fa-comments fa-3x mb-3"></i>
@@ -413,7 +421,6 @@ export default function MassageModal({ closeModal }) {
 
                               <div className="direct-chat-text msg-with-time">
                                 {m.message}
-
                                 <span
                                   className={`msg-time ${
                                     isMine ? "right-corner" : "left-corner"
@@ -429,7 +436,9 @@ export default function MassageModal({ closeModal }) {
 
                       {typing && (
                         <div className="typing-indicator">
-                          {role === "admin" ? peer?.firstName : admin?.firstName}{" "}
+                          {role === "admin"
+                            ? peer?.firstName
+                            : admin?.firstName}{" "}
                           is typing…
                         </div>
                       )}
@@ -462,10 +471,8 @@ export default function MassageModal({ closeModal }) {
                     </div>
                   </div>
                 )}
-
               </div>
             </div>
-
           </div>
         </div>
       </div>
